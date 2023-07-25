@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.hr.payroll.inherited</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="50" />
+        <field name="inherit_id" ref="hr_payroll.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='hr_payroll_accountant']" position="after">
+                <h2>Penalty</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-lg-6 col-12 o_setting_box">
+                        <div class="o_setting_left_pane" />
+                        <div class="o_setting_right_pane">
+                            <label for="threshold" class="o_light_label" string="Threshold" />
+                            <field name="threshold"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+                            <span>time(s)</span>
+
+                            <br />
+
+                            <label for="deduced_amount" class="o_light_label"
+                                string="Deduced Amount" />
+                            <field name="deduced_amount"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+
+                            <br />
+
+                            <label for="monlty_timeoff" class="o_light_label"
+                                string="Monlty Timeoff" />
+                            <field name="monlty_timeoff"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+
+                            <br />
+
+                            <label for="overtime_threshold" class="o_light_label"
+                                string="Overtime Threshold" />
+                            <field name="overtime_threshold"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+                            <span>hour(s)</span>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
