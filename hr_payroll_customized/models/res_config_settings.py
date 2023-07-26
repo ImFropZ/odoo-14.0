@@ -24,30 +24,48 @@ class ResConfigSettings(models.TransientModel):
     overtime_threshold = fields.Float(
         string="Overtime Threshold", help="Set the threshold of overtime e.g 8", config_parameter="hr_payroll_customized.overtime_threshold", default=8)
 
+    late_check_in = fields.Float(
+        string="Late Check-in", help="Set late duration after work check-in", config_parameter="hr_payroll_customized.late_check_in", default=0)
+
+    early_check_out = fields.Float(
+        string="Early Check-out", help="Set early duration before work check-out", config_parameter="hr_payroll_customized.early_check_out", default=0)
+
     @api.model
     def get_deduced_amount_from_settings(self):
         config_parameter_key = 'hr_payroll_customized.deduced_amount'
-        deduced_amount = float(self.env['ir.config_parameter'].sudo(
-        ).get_param(config_parameter_key, default=0))
-        return deduced_amount
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
 
     @api.model
     def get_threshold_from_settings(self):
         config_parameter_key = 'hr_payroll_customized.threshold'
-        threshold = float(self.env['ir.config_parameter'].sudo(
-        ).get_param(config_parameter_key, default=0))
-        return threshold
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
 
     @api.model
     def get_monlty_timeoff_from_settings(self):
         config_parameter_key = "hr_payroll_customized.monlty_timeoff"
-        monlty_timeoff = float(self.env['ir.config_parameter'].sudo(
-        ).get_param(config_parameter_key, default=0))
-        return monlty_timeoff
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
 
     @api.model
     def get_overtime_threshold_from_settings(self):
         config_parameter_key = "hr_payroll_customized.overtime_threshold"
-        overtime_threshold = float(self.env['ir.config_parameter'].sudo(
-        ).get_param(config_parameter_key, default=8))
-        return overtime_threshold
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=8))
+
+    @api.model
+    def get_late_check_in_from_settings(self):
+        config_parameter_key = "hr_payroll_customized.late_check_in"
+
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
+
+    @api.model
+    def get_early_check_out_from_settings(self):
+        config_parameter_key = "hr_payroll_customized.early_check_out"
+
+        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
+
+    @api.constrains("late_check_in", "early_check_out")
+    def _check_validation_hour(self):
+        if self.late_check_in < 0:
+            self.late_check_in = 0
+
+        if self.early_check_out < 0:
+            self.early_check_out = 0
