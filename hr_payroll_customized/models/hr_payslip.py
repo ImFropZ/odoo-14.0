@@ -6,13 +6,9 @@ from itertools import groupby
 class HrPayslipCustomized(models.Model):
     _inherit = "hr.payslip"
 
-    count = fields.Integer(string="Count", readonly=True,
-                           compute="_compute_count")
-
-    extra_paid_amount = fields.Float(string="Extra Paid Amount", readonly=True)
-    deduced_paid_amount = fields.Float(
-        string="Deduced Paid Amount", readonly=True)
-
+    days_in_the_period = fields.Integer(
+        string="Days in the period", readonly=True, compute="_compute_days_in_the_period")
+    
     paid_amount = fields.Float(
         string="Paid Amount", readonly=True)
 
@@ -20,18 +16,14 @@ class HrPayslipCustomized(models.Model):
     # National Holiday Fields
     national_holiday_count = fields.Integer(
         string="National Holiday OT Count", readonly=True)
-    national_holiday_paid = fields.Float(
-        string="National Holiday Paid Amount", readonly=True)
 
     # Timeoff Fields
     timeoff_count = fields.Float(
         string="Timeoff left over count", readonly=True)
-    timeoff_paid = fields.Float(string="Timeoff Paid Amount", readonly=True)
 
     # Overtime Fields
     overtime_count = fields.Float(
         string="Overtime hour(s)", readonly=True)
-    overtime_paid = fields.Float(string="Overtime Paid Amount", readonly=True)
 
     # Deduced Fields
     # Missed Finger Print Fields
@@ -42,24 +34,23 @@ class HrPayslipCustomized(models.Model):
 
     # Late Check-in, Early Check-out fields
     late_check_in_count = fields.Integer(string="Late Check-in", readonly=True)
-    early_check_in_count = fields.Integer(
+    early_check_out_count = fields.Integer(
         string="Early Check-out", readonly=True)
-    late_check_in_and_early_check_out_paid_amount = fields.Float(
-        string="Late Check-in Early Check-out Paid Amount", readonly=True)
 
     # លំហែបិតុភាព កាត់
 
-    @api.depends("employee_id", "date_from", "date_to")
-    def _compute_count(self):
+    @api.depends("date_from", "date_to")
+    def _compute_days_in_the_period(self):
+        self.days_in_the_period = self._get_days()
+
+    @api.depends("employee_id")
+    def _update_employee(self):
         if not self.employee_id:
-            self.count = 0
             return
 
         self._calculate_extra_bonus()
 
         self._calculate_penalty()
-
-        self.count = 0
 
     def _integer_to_day_name(self, index_day_of_week) -> str:
         day_names = ['Monday', 'Tuesday', 'Wednesday',
@@ -114,10 +105,6 @@ class HrPayslipCustomized(models.Model):
             return timedelta.days
         return 1
 
-    # Return average salary of current employee
-    def _get_salary_avg_day(self):
-        return self._get_salary() / self._get_days()
-
     # Return salary of current employee
     def _get_salary(self):
         return sum(self.worked_days_line_ids.mapped("amount"))
@@ -127,14 +114,10 @@ class HrPayslipCustomized(models.Model):
         settings = self.env['res.config.settings'].create({})
         setting_monlty_timeoff = settings.get_monlty_timeoff_from_settings()
 
-        # NOTE: Duration Display from timeoff is format like this e.g. 1.5 days
-        self.timeoff_count = max(
-            0, setting_monlty_timeoff - float(self._get_employee_timeoff().duration_display.split(' ')[0]))
-
-        if self.timeoff_count > 0:
-            self.timeoff_paid = self._get_salary_avg_day() * self.timeoff_count
-        else:
-            self.timeoff_paid = 0
+        if self._get_employee_timeoff().duration_display:
+            # NOTE: Duration Display from timeoff is format like this e.g. 1.5 days
+            self.timeoff_count = max(
+                0, setting_monlty_timeoff - float(self._get_employee_timeoff().duration_display.split(' ')[0]))
 
     # Calculate the overtime
     def _calculate_overtime(self):
@@ -146,8 +129,6 @@ class HrPayslipCustomized(models.Model):
             worked_hours = max(0, attendance.worked_hours -
                                setting_overtime_threshold)
             self.overtime_count += worked_hours
-
-        self.overtime_paid = self._get_salary_avg_day() / 8 * 3 * self.overtime_count
 
     # Calculate the national holiday overtime
     def _calculate_national_holiday(self):
@@ -167,26 +148,18 @@ class HrPayslipCustomized(models.Model):
                     national_holiday_count += 1
 
         self.national_holiday_count = national_holiday_count
-        self.national_holiday_paid = self._get_salary_avg_day() * national_holiday_count
-
-    # Add bonus money to extra_paid_amount
-    def _calculate_bonus_paid_amount(self):
-        self.extra_paid_amount = self.national_holiday_paid + \
-            self.timeoff_paid + self.overtime_paid
 
     # Calculate the missed finger print
     def _calculate_missed_finger_print(self):
         settings = self.env['res.config.settings'].create({})
 
-        self.missed_finger_print_count = sum(
-            self._get_attendance_records().mapped('count'))
-
         # Getting threshold and deduced amount from settings
         setting_threshold = settings.get_threshold_from_settings()
         setting_deduced_amount = settings.get_deduced_amount_from_settings()
 
-        self.missed_finger_print_paid = math.floor(
-            self.count / setting_threshold) * setting_deduced_amount
+        self.missed_finger_print_count = math.floor(sum(
+            self._get_attendance_records().mapped('count')) / setting_threshold)
+        self.missed_finger_print_paid = setting_deduced_amount
 
     # Calculate the late check-in and early check-out
     def _calculate_late_check_in_and_early_check_out(self):
@@ -238,14 +211,5 @@ class HrPayslipCustomized(models.Model):
                     if worked_day.hour_to - check_out_time > setting_early_check_out:
                         early_check_out_count += 1
 
-
-        print(f"Check In Late: {late_check_in_count}")
-        print(f"Check Out Early: {early_check_out_count}")
-
         self.late_check_in_count = late_check_in_count
         self.early_check_out_count = early_check_out_count
-        self.late_check_in_and_early_check_out_paid_amount = self._get_salary_avg_day / \
-            8 * (late_check_in_count + early_check_out_count)
-
-    def _calculate_deduced_paid_amount(self):
-        self.deduced_paid_amount = self.missed_finger_print_paid + self.late_check_in_and_early_check_out_paid_amount
