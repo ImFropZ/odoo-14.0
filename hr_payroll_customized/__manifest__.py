@@ -13,6 +13,7 @@ HR Payroll Customized By Anakut
 """,
     'depends': ['hr_payroll', 'hr_attendance_customized', 'hr_holidays'],
     'data': [
+        'views/hr_payslip_views.xml',
         'views/res_config_settings_views.xml'
     ],
     'demo': [],
