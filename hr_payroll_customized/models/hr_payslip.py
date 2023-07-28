@@ -8,7 +8,7 @@ class HrPayslipCustomized(models.Model):
 
     days_in_the_period = fields.Integer(
         string="Days in the period", readonly=True, compute="_compute_days_in_the_period")
-    
+
     paid_amount = fields.Float(
         string="Paid Amount", readonly=True)
 
@@ -39,23 +39,15 @@ class HrPayslipCustomized(models.Model):
 
     # លំហែបិតុភាព កាត់
 
-    @api.depends("date_from", "date_to")
+    @api.depends("employee_id", "date_from", "date_to")
     def _compute_days_in_the_period(self):
         self.days_in_the_period = self._get_days()
-
-    @api.depends("employee_id")
-    def _update_employee(self):
         if not self.employee_id:
             return
 
         self._calculate_extra_bonus()
 
         self._calculate_penalty()
-
-    def _integer_to_day_name(self, index_day_of_week) -> str:
-        day_names = ['Monday', 'Tuesday', 'Wednesday',
-                     'Thursday', 'Friday', 'Saturday', 'Sunday']
-        return day_names[int(index_day_of_week)]
 
     def _calculate_extra_bonus(self):
         # Calculate national holiday overtime
@@ -67,15 +59,10 @@ class HrPayslipCustomized(models.Model):
         # Calculate the overtime
         self._calculate_overtime()
 
-        # Caclulate bonus paid amount
-        self._calculate_bonus_paid_amount()
-
     def _calculate_penalty(self):
         self._calculate_missed_finger_print()
 
         self._calculate_late_check_in_and_early_check_out()
-
-        self._calculate_deduced_paid_amount()
 
     # Return current employee attendance records
     def _get_attendance_records(self):
@@ -122,6 +109,8 @@ class HrPayslipCustomized(models.Model):
     # Calculate the overtime
     def _calculate_overtime(self):
         settings = self.env['res.config.settings'].create({})
+
+        self.overtime_count = 0
 
         setting_overtime_threshold = settings.get_overtime_threshold_from_settings()
 

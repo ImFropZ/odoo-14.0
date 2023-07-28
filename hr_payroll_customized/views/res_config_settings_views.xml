@@ -12,49 +12,45 @@
                     <div class="col-lg-6 col-12 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
-                            <label for="threshold" class="o_light_label" string="Threshold" />
-                            <field name="threshold"
-                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
-                            <span>time(s)</span>
-
-                            <br />
-
-                            <label for="deduced_amount" class="o_light_label"
-                                string="Deduced Amount" />
-                            <field name="deduced_amount"
-                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
-
-                            <br />
-
                             <label for="monlty_timeoff" class="o_light_label"
                                 string="Monlty Timeoff" />
                             <field name="monlty_timeoff"
                                 class="oe_inline col-4 col-lg-2 me-1 text-center" />
+                            <span>day(s)</span>
 
+                            <h2>Missing Finger Print</h2>
+                            <label for="threshold" class="o_light_label" string="Threshold" />
+                            <field name="threshold"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+                            <span>time(s)</span>
                             <br />
+                            <label for="deduced_amount" class="o_light_label"
+                                string="Deduced Amount" />
+                            <field name="deduced_amount"
+                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
+                            <span>$</span>
 
+                            <h2>Overtime</h2>
                             <label for="overtime_threshold" class="o_light_label"
                                 string="Overtime Threshold" />
                             <field name="overtime_threshold"
                                 class="oe_inline col-4 col-lg-2 me-1 text-center" />
                             <span>hour(s)</span>
 
-                            <br />
-
                             <h2>Late Check-In</h2>
-                            <br />
-
                             <label for="late_check_in" class="o_light_label" string="Late Check-in" />
                             <field name="late_check_in"
-                                class="oe_inline col-4 col-lg-2 me-1 text-center" widget="float_time"/>
+                                class="oe_inline col-4 col-lg-2 me-1 text-center"
+                                widget="float_time" />
+                            <span>hour(s)</span>
 
                             <h2>Early Check-Out</h2>
-                            <br />
-
                             <label for="early_check_out" class="o_light_label"
                                 string="Early Check-out" />
                             <field name="early_check_out"
-                                class="oe_inline col-4 col-lg-2 me-1 text-center" widget="float_time"/>
+                                class="oe_inline col-4 col-lg-2 me-1 text-center"
+                                widget="float_time" />
+                            <span>hour(s)</span>
 
                         </div>
                     </div>
