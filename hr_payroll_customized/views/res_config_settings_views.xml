@@ -12,12 +12,6 @@
                     <div class="col-lg-6 col-12 o_setting_box">
                         <div class="o_setting_left_pane" />
                         <div class="o_setting_right_pane">
-                            <label for="monlty_timeoff" class="o_light_label"
-                                string="Monlty Timeoff" />
-                            <field name="monlty_timeoff"
-                                class="oe_inline col-4 col-lg-2 me-1 text-center" />
-                            <span>day(s)</span>
-
                             <h2>Missing Finger Print</h2>
                             <label for="threshold" class="o_light_label" string="Threshold" />
                             <field name="threshold"

@@ -98,13 +98,20 @@ class HrPayslipCustomized(models.Model):
 
     # Calculate the dayoff
     def _calculate_dayoff_work(self):
-        settings = self.env['res.config.settings'].create({})
-        setting_monlty_timeoff = settings.get_monlty_timeoff_from_settings()
-
         if self._get_employee_timeoff().duration_display:
             # NOTE: Duration Display from timeoff is format like this e.g. 1.5 days
-            self.timeoff_count = max(
-                0, setting_monlty_timeoff - float(self._get_employee_timeoff().duration_display.split(' ')[0]))
+            # duration display can be days or hours
+            duration_obj = self._get_employee_timeoff().duration_display.split(' ')
+            if duration_obj[1] == 'days':
+                self.timeoff_count = max(
+                    0, self.contract_id.timeoff_limits - float(duration_obj[0]))
+            elif duration_obj[1] == 'hours':
+                # if it's in hours we will calculate it to day
+                self.timeoff_count = max(
+                    0, self.contract_id.timeoff_limits - float(duration_obj[0]) / 24)
+            return
+        else:
+            self.timeoff_count = self.contract_id.timeoff_limits
 
     # Calculate the overtime
     def _calculate_overtime(self):

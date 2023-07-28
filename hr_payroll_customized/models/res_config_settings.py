@@ -18,9 +18,6 @@ class ResConfigSettings(models.TransientModel):
         default=0
     )
 
-    monlty_timeoff = fields.Float(
-        string="Monlty Timeoff", config_parameter="hr_payroll_customized.monlty_timeoff", default=0)
-
     overtime_threshold = fields.Float(
         string="Overtime Threshold", help="Set the threshold of overtime e.g 8", config_parameter="hr_payroll_customized.overtime_threshold", default=8)
 
@@ -38,11 +35,6 @@ class ResConfigSettings(models.TransientModel):
     @api.model
     def get_threshold_from_settings(self):
         config_parameter_key = 'hr_payroll_customized.threshold'
-        return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
-
-    @api.model
-    def get_monlty_timeoff_from_settings(self):
-        config_parameter_key = "hr_payroll_customized.monlty_timeoff"
         return float(self.env['ir.config_parameter'].sudo().get_param(config_parameter_key, default=0))
 
     @api.model
