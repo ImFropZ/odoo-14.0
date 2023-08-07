@@ -37,8 +37,6 @@ class HrPayslipCustomized(models.Model):
     early_check_out_count = fields.Integer(
         string="Early Check-out", readonly=True)
 
-    # លំហែបិតុភាព កាត់
-
     @api.depends("employee_id", "date_from", "date_to")
     def _compute_days_in_the_period(self):
         self.days_in_the_period = self._get_days()
@@ -89,7 +87,7 @@ class HrPayslipCustomized(models.Model):
     def _get_days(self):
         if self.date_to and self.date_from:
             timedelta = self.date_to - self.date_from
-            return timedelta.days
+            return timedelta.days + 1
         return 1
 
     # Return salary of current employee
